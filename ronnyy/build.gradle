@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
+
+
+android {
+    
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+    }
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            }
+        }
+   
+       compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        
+}
+
+
+
+dependencies {
+    implementation 'com.github.EasyAppm:Easyapp:1.0.8'
+}
+
+afterEvaluate {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    from components.release
+                    groupId = 'com.github.easyappm'
+                    artifactId = 'RonnyyDevelop'
+                    version = '1.0.0'
+            }
+        }
+    }
+}
+
