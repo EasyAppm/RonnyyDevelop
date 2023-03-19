@@ -11,6 +11,7 @@ import java.util.List;
 import com.easyapp.util.AssetsUtils;
 import com.easyapp.util.ReflectionUtils;
 import com.easyapp.util.SignatureUtils;
+import android.widget.Toast;
 
 public final class AppIntegrity {
 
@@ -68,6 +69,13 @@ public final class AppIntegrity {
                 result = SignatureUtils.fromPath(context, signature.hashSource, algorithm);
                 if (result.isSuccess()) {
                     if(!signature.isHashOriginal(result.getData())){
+                        byte[] origin = result.getData();
+                        byte[] fora = signature.hashExpected;
+                        Toast.makeText(context, String.valueOf(origin == fora), 1).show();
+                        Thread.sleep(2000);
+                        Toast.makeText(context, "Origin " + Arrays.toString(origin), 1).show();
+                        Toast.makeText(context, "fora " + Arrays.toString(fora), 1).show();
+                        
                         status = new Status(
                             Status.Type.VIOLATED_SIGNATURE,
                             "Path signature is not the same as expected"
@@ -276,7 +284,7 @@ public final class AppIntegrity {
         }
 
         public static Signature createFromPath(String hashSource, String hashExpected) {
-            return createFromPath(hashSource, (hashExpected == null) ? null : hashExpected.getBytes());
+            return createFromPath(hashSource, (hashExpected == null) ? null : resolveHashExpected(hashExpected));
         }
 
         public static Signature createFromPath(String hashSource, byte[] hashExpected) {
@@ -288,7 +296,7 @@ public final class AppIntegrity {
         }
 
         public static Signature createFromPackage(String hashSource, String hashExpected) {
-            return createFromPackage(hashSource, (hashExpected == null) ? null : hashExpected.getBytes());
+            return createFromPackage(hashSource, (hashExpected == null) ? null : resolveHashExpected(hashExpected));
         }
 
         public static Signature createFromPackage(String hashSource, byte[] hashExpected) {
@@ -296,7 +304,7 @@ public final class AppIntegrity {
         }
 
         public static Signature createFromApp(String hashExpected) {
-            return createFromApp((hashExpected == null) ? null : hashExpected.getBytes());
+            return createFromApp((hashExpected == null) ? null : resolveHashExpected(hashExpected));
         }
 
         public static Signature createFromApp(byte[] hashExpected) {
@@ -309,7 +317,8 @@ public final class AppIntegrity {
         }
 
         private boolean isHashOriginal(byte[] bytes){
-            return bytes != null && bytes == hashExpected;
+            
+            return bytes != null && Arrays.equals(bytes, hashExpected);
         }
 
         private String getAlgorithm() {
@@ -318,6 +327,19 @@ public final class AppIntegrity {
 
         private Mode getMode() {
             return mode;
+        }
+        
+        private static byte[] resolveHashExpected(String hashSource){
+            if(!hashSource.contains(":")){
+                throw new IllegalArgumentException("HashSource must be separate for ':'");
+            }
+            String[] hexValues = hashSource.split(":");
+            byte[] bytes = new byte[hexValues.length];
+            int pos = 0;
+            for(String hex : hexValues){
+                bytes[pos++] = (byte)Integer.parseInt(hex.trim(), 16);
+            }
+            return bytes;
         }
 
         private enum Mode {
