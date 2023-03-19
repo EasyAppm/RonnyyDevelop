@@ -1,17 +1,14 @@
 package com.easyapp.ronnyy.demo;
  
 import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import com.easyapp.ronnyy.security.AppIntegrity;
 import java.io.IOException;
 import java.util.ArrayList;
-import com.easyapp.util.SignatureUtils;
-import android.app.Application;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import android.widget.Toast;
 
 public class MainActivity extends Activity { 
 
