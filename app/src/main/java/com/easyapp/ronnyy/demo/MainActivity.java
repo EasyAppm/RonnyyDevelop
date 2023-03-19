@@ -68,7 +68,8 @@ public class MainActivity extends Activity {
 
 
             );
-           text.setText(ai.check().getType().toString());
+            
+         
             
         } catch (Exception e) {
             text.setText(e.toString());

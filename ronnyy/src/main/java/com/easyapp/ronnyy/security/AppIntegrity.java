@@ -1,17 +1,14 @@
 package com.easyapp.ronnyy.security;
 
 import android.content.Context;
-
+import android.widget.Toast;
 import com.easyapp.core.TypeValidator;
-
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import com.easyapp.util.AssetsUtils;
 import com.easyapp.util.ReflectionUtils;
 import com.easyapp.util.SignatureUtils;
-import android.widget.Toast;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public final class AppIntegrity {
 
@@ -57,42 +54,35 @@ public final class AppIntegrity {
             case APP:
                 result = SignatureUtils.fromApp(context, algorithm);
                 if (result.isSuccess()) {
-                    if(!signature.isHashOriginal(result.getData())){
+                    if (!signature.isHashOriginal(result.getData())) {
                         status = new Status(
                             Status.Type.VIOLATED_SIGNATURE,
                             "App signature is not the same as expected"
                         );
                     }
-                }else throw result.getError();
+                } else throw result.getError();
                 break;
             case PATH:
                 result = SignatureUtils.fromPath(context, signature.hashSource, algorithm);
                 if (result.isSuccess()) {
-                    if(!signature.isHashOriginal(result.getData())){
-                        byte[] origin = result.getData();
-                        byte[] fora = signature.hashExpected;
-                        Toast.makeText(context, String.valueOf(origin == fora), 1).show();
-                        Thread.sleep(2000);
-                        Toast.makeText(context, "Origin " + Arrays.toString(origin), 1).show();
-                        Toast.makeText(context, "fora " + Arrays.toString(fora), 1).show();
-                        
+                    if (!signature.isHashOriginal(result.getData())) {
                         status = new Status(
                             Status.Type.VIOLATED_SIGNATURE,
                             "Path signature is not the same as expected"
                         );
                     }
-                }else throw result.getError();
+                } else throw result.getError();
                 break;
             case PACKAGE:
                 result = SignatureUtils.fromPackage(context, signature.hashSource, algorithm);
                 if (result.isSuccess()) {
-                    if(!signature.isHashOriginal(result.getData())){
+                    if (!signature.isHashOriginal(result.getData())) {
                         status = new Status(
                             Status.Type.VIOLATED_SIGNATURE,
                             "Package signature is not the same as expected"
                         );
                     }
-                }else throw result.getError();
+                } else throw result.getError();
                 break;
         }
         return status;
@@ -316,8 +306,8 @@ public final class AppIntegrity {
             return this;
         }
 
-        private boolean isHashOriginal(byte[] bytes){
-            
+        private boolean isHashOriginal(byte[] bytes) {
+
             return bytes != null && Arrays.equals(bytes, hashExpected);
         }
 
@@ -328,15 +318,15 @@ public final class AppIntegrity {
         private Mode getMode() {
             return mode;
         }
-        
-        private static byte[] resolveHashExpected(String hashSource){
-            if(!hashSource.contains(":")){
+
+        private static byte[] resolveHashExpected(String hashSource) {
+            if (!hashSource.contains(":")) {
                 throw new IllegalArgumentException("HashSource must be separate for ':'");
             }
             String[] hexValues = hashSource.split(":");
             byte[] bytes = new byte[hexValues.length];
             int pos = 0;
-            for(String hex : hexValues){
+            for (String hex : hexValues) {
                 bytes[pos++] = (byte)Integer.parseInt(hex.trim(), 16);
             }
             return bytes;
@@ -405,6 +395,11 @@ public final class AppIntegrity {
 
         public boolean isSafe() {
             return type == Type.PASS;
+        }
+
+        @Override
+        public String toString() {
+            return type.name() + "\n" + getAbout();
         }
 
         public enum Type {
