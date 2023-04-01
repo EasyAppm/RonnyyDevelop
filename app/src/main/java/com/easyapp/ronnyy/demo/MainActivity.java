@@ -1,5 +1,5 @@
 package com.easyapp.ronnyy.demo;
- 
+
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
@@ -9,102 +9,111 @@ import com.easyapp.ronnyy.security.AppIntegrity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import com.easyapp.ronnyy.rpeasyapp.RpService;
+import com.http.ceas.callback.RestCallback;
+import com.http.ceas.core.HttpHeaders;
+import com.http.ceas.core.HttpStatus;
+import com.easyapp.ronnyy.rpeasyapp.CipherApi;
+import com.easyapp.ronnyy.rpeasyapp.UserModel;
+import com.easyapp.ronnyy.rpeasyapp.RpCallback;
+import com.easyapp.ronnyy.rpeasyapp.ErrorCode;
 
 public class MainActivity extends Activity { 
 
     TextView text;
-     
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text = findViewById(R.id.activitymainTextView1);
         /*String path = getPackageCodePath();
-        try{
-           text.setText("md5 : " + SignatureUtils.fromApp(this, "md5").getDataInHex());
-           text.append("\n256 : " + SignatureUtils.fromApp(this, "SHA-1").getDataInHex());
-        }catch(Exception e){
-            text.setText(e.toString());
-        }
+         try{
+         text.setText("md5 : " + SignatureUtils.fromApp(this, "md5").getDataInHex());
+         text.append("\n256 : " + SignatureUtils.fromApp(this, "SHA-1").getDataInHex());
+         }catch(Exception e){
+         text.setText(e.toString());
+         }
 
-        try{
-            List<File> list = AssetsUtils.listAllFiles(this, "");
-            text.setText(list.size()+"\n");
-            if(!list.isEmpty())
-            for(File file : list){
-                text.append(file.getAbsolutePath() + (AssetsUtils.isFile(this, file.getAbsolutePath()) ? " - FILE - " : " - DIR - ") + "\n");
-            }
-           
-            
-        }catch(Exception e){
-            text.setText(e.toString());
-        }*/
+         try{
+         List<File> list = AssetsUtils.listAllFiles(this, "");
+         text.setText(list.size()+"\n");
+         if(!list.isEmpty())
+         for(File file : list){
+         text.append(file.getAbsolutePath() + (AssetsUtils.isFile(this, file.getAbsolutePath()) ? " - FILE - " : " - DIR - ") + "\n");
+         }
+
+
+         }catch(Exception e){
+         text.setText(e.toString());
+         }*/
+
         
-        byte[] bytes;
+        UserModel model = UserModel.buider()
+            .setName("carlosdemo")
+            .setSha1("68ba07a72441703b")
+            .setSha2("166082cfe709f30b")
+            .setToken("-NR96y3H9yAsoczTOvzu")
+            .create();
+
+        RpService h = RpService.newRpService(model);
         
-        String var = "38:E8:B5:06:1F:21:03:9D:2F:14:C0:87:32:7B:27:6C:00:30:23:ED:0D:CF:84:61:73:D6:3C:19:58:0F:5D:44";
-        String[] hexs = var.split(":");
-        bytes = new byte[hexs.length];
-        int pos = 0;
-        for(String hex : hexs){
-            int in = Integer.parseInt(hex, 16);
-            bytes[pos++] = (byte)in;
-        }
-        try {
-            text.setText(Arrays.toString(bytes));
-        } catch (Exception e) {}
+        h.login(new RpCallback(){
 
-        //Toast.makeText(this, Arrays.toString(SignatureUtils.fromPath(this, getPackageCodePath(), "SHA-256").getData()), 1).show();
-        
-        
-        try {
-            AppIntegrity ai = AppIntegrity.newInstance(
-                this,
+                @Override
+                public void onResponse(String body, ErrorCode error) {
+                    if (error == null) {
+                        text.setText(body);
+                    } else {
+                        text.setText(error.message);
+                    }
+                }
 
-                AppIntegrity.Signature.createFromPath(
-                    getPackageCodePath(), 
-                    "38:E8:B5:06:1F:21:03:9D:2F:14:C0:87:32:7B:27:6C:00:30:23:ED:0D:CF:84:61:73:D6:3C:19:58:0F:5D:44"
-                ).setAlgorithm("SHA-256")
+                @Override
+                public void onException(Exception e) {
+                    text.setText(e.toString());
+                }
 
 
-            );
-            
-         
-            
-        } catch (Exception e) {
-            text.setText(e.toString());
-        }
+            });
 
-       
-            
+        /*try {
+         text.setText(new String(
+         new CipherApi(sha1, sha2).decrypt(txt)
+         ));
+         } catch (Exception e) {
+         text.setText(e.toString());
+         }*/
+
+
         //  text.setText(SignatureUtils.fromPath(this, getPackageCodePath(), "SHA-256").getDataInHex());
-        try{
-           // testeSegurança();
-       // text.setText(ai.check().getType().name());
-        }catch(Exception e){
+        try {
+            // testeSegurança();
+            // text.setText(ai.check().getType().name());
+        } catch (Exception e) {
             //text.setText(e.toString());
         }
-        
+
         //text.setText(MainActivity.class.getName());
         /*try{
-            InputStream is = AssetsUtils.open(this, "arquivo1.txt");
-            if(is!=null)
-            text.setText(is.available() +"\n"+ StreamUtils.toString(is));
-            else
-            text.setText("nulo");
-        }catch(Exception e){
-            text.setText(e.toString());
-        }*/
+         InputStream is = AssetsUtils.open(this, "arquivo1.txt");
+         if(is!=null)
+         text.setText(is.available() +"\n"+ StreamUtils.toString(is));
+         else
+         text.setText("nulo");
+         }catch(Exception e){
+         text.setText(e.toString());
+         }*/
         // listAssetFiles("");
-      
-       // listAssets("");
-       /* try{
-            for(String pathAsset : getAssets().list("")){
-                text.append(pathAsset + "\n");
-            }
-        }catch(IOException e){}*/
+
+        // listAssets("");
+        /* try{
+         for(String pathAsset : getAssets().list("")){
+         text.append(pathAsset + "\n");
+         }
+         }catch(IOException e){}*/
     }
-    
+
     private boolean listAssetFiles(String path) {
 
         String [] list;
@@ -118,7 +127,7 @@ public class MainActivity extends Activity {
                     if (!listAssetFiles(path + "/" + file))
                         return false;
                     else {
-                       // Log.d("Teste", file);
+                        // Log.d("Teste", file);
                         // This is a file
                         // TODO: add file name to an array list
                     }
@@ -130,7 +139,7 @@ public class MainActivity extends Activity {
 
         return true; 
     }
-    
+
     private ArrayList<String> listAssetFiless(String path) {
         ArrayList<String> fileList = new ArrayList<>();
         try {
@@ -150,12 +159,12 @@ public class MainActivity extends Activity {
         }
         return fileList;
     }
-    
+
     private void testeSegurança() throws Exception {
         String nameApp = "origin.apk";
         String sha256 = "83:88:BC:B7:87:F4:58:41:B6:9E:6A:F2:8C:EB:41:91:5F:D0:07:FB:73:E7:20:0E:FC:8E:CD:FB:E3:30:27:CB".replace(":", "");
         String apkPathSignature = getPackageCodePath();
-       // msg(apkPathSignature);
+        // msg(apkPathSignature);
         Class<?> classApp = Applications.class; //Nome da sua class que herda de Application
 
         AppIntegrity aI = AppIntegrity.newInstance(
@@ -166,11 +175,11 @@ public class MainActivity extends Activity {
         );
         AppIntegrity.Status status = aI.check();
         text.setText(String.valueOf(status.isSafe()));
-        if(!status.isSafe()){
-            
+        if (!status.isSafe()) {
+
 //            msg(status.getAbout());
 //            finishAffinity();
         }
     }
-	
+
 } 
