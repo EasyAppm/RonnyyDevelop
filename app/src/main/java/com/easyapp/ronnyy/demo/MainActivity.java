@@ -5,18 +5,13 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import com.easyapp.ronnyy.rpeasyapp.ErrorCode;
+import com.easyapp.ronnyy.rpeasyapp.RpCallback;
+import com.easyapp.ronnyy.rpeasyapp.RpService;
+import com.easyapp.ronnyy.rpeasyapp.UserModel;
 import com.easyapp.ronnyy.security.AppIntegrity;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import com.easyapp.ronnyy.rpeasyapp.RpService;
-import com.http.ceas.callback.RestCallback;
-import com.http.ceas.core.HttpHeaders;
-import com.http.ceas.core.HttpStatus;
-import com.easyapp.ronnyy.rpeasyapp.CipherApi;
-import com.easyapp.ronnyy.rpeasyapp.UserModel;
-import com.easyapp.ronnyy.rpeasyapp.RpCallback;
-import com.easyapp.ronnyy.rpeasyapp.ErrorCode;
 
 public class MainActivity extends Activity { 
 
