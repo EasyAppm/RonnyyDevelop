@@ -52,11 +52,12 @@ public class MainActivity extends Activity {
             .create();
 
         RpService h = RpService.newRpService(model);
-        
+       
         h.login(new RpCallback(){
 
                 @Override
                 public void onResponse(String body, ErrorCode error) {
+                    
                     if (error == null) {
                         text.setText(body);
                     } else {
