@@ -1,9 +1,14 @@
 package com.easyapp.ronnyy.rpeasyapp;
+
+import android.util.Log;
+
 import com.easyapp.core.TypeValidator;
 import com.http.ceas.ClientFactory;
+import com.http.ceas.callback.HttpCallback;
 import com.http.ceas.callback.RestCallback;
 import com.http.ceas.core.HttpHeaders;
 import com.http.ceas.core.HttpStatus;
+import com.http.ceas.entity.Response;
 
 public class RpService {
 
@@ -19,51 +24,124 @@ public class RpService {
         return new RpService(userModel);
     }
 
-    public void login(final RpCallback rpCallback) {
-        client.login(userModel.getName(), userModel.getToken()).then(new ClientCallback(rpCallback));
+    public void login(RpCallback rpCallback) {
+        login(rpCallback, false);
+    }
+    public void login(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.login(
+                userModel.getAuth(),
+                userModel.getUser(),
+                userModel.getPassword(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus));
     }
 
-    public void banner(final RpCallback rpCallback) {
-        client.banner(userModel.getName(), userModel.getToken()).then(new ClientCallback(rpCallback));
+    public void categoriaTV(RpCallback rpCallback) {
+        categoriaTV(rpCallback, false);
     }
 
-    public void changeCipher(final RpCallback rpCallback) {
-        client.changeCipher(userModel.getName(), userModel.getToken()).then(new ClientCallback(rpCallback));
+    public void categoriaTV(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.categoriaTV(
+                userModel.getAuth(),
+                userModel.getUser(),
+                userModel.getPassword(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus));
     }
 
-    private final class ClientCallback extends RestCallback {
+    public void categoriaFilmes(RpCallback rpCallback) {
+        categoriaFilmes(rpCallback, false);
+    }
+
+    public void categoriaFilmes(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.categoriaFilmes(
+                userModel.getAuth(),
+                userModel.getUser(),
+                userModel.getPassword(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus));
+    }
+
+    public void categoriaSeries(RpCallback rpCallback){
+        categoriaSeries(rpCallback, false);
+    }
+    public void categoriaSeries(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.categoriaSeries(
+                userModel.getAuth(),
+                userModel.getUser(),
+                userModel.getPassword(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus));
+    }
+
+
+    public void banner(RpCallback rpCallback) {
+        banner(rpCallback, false);
+    }
+    public void banner(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.banner(
+                userModel.getAuth(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus));
+    }
+    public void changeCipher(RpCallback rpCallback) {
+        changeCipher(rpCallback, false);
+    }
+
+    public void changeCipher(RpCallback rpCallback, boolean ignoreErrorStatus) {
+        client.changeCipher(
+                userModel.getAuth(),
+                userModel.getToken()
+        ).then(new Callback(rpCallback, ignoreErrorStatus, false));
+    }
+
+    private final class Callback extends RestCallback {
 
         private final RpCallback rpCallback;
+        private final boolean ignoreErrorStatus;
+        private final boolean useDecrypt;
 
-        public ClientCallback(RpCallback rpCallback) {
+        public Callback(RpCallback rpCallback, boolean ignoreErrorStatus, boolean useDecrypt) {
             this.rpCallback = TypeValidator.nonNull(rpCallback, "RpCallback cannot be null.");
+            this.ignoreErrorStatus = ignoreErrorStatus;
+            this.useDecrypt = useDecrypt;
         }
 
-        @Override
-        public void onFailure(Exception p1) {
-            rpCallback.onException(p1);
+        public Callback(RpCallback rpCallback, boolean ignoreErrorStatus){
+            this(rpCallback, ignoreErrorStatus, true);
         }
 
-        @Override
-        public void onResponse(String body, HttpStatus p2, HttpHeaders p3) throws Exception {
-            String sha1 = userModel.getSha1();
-            String sha2 = userModel.getSha2();
-            ErrorCode errorCode = null;
-            try {
-                if (body.trim().matches("[0-9]+"))
-                    errorCode = ErrorCode.valueOf(Long.valueOf(body));
-            } catch (Exception ignore) {}
 
-            if (errorCode == null) {
-                body = new String(new CipherApi(sha1, sha2).decrypt(body));
+        @Override
+        public void onResponse(String body, HttpStatus status, HttpHeaders headers) throws Exception {
+            if (!status.isSuccess() && !ignoreErrorStatus) {
+                throw new IllegalArgumentException(
+                        String.format("The status code %s, not is valid", status)
+                );
             }
-
-            rpCallback.onResponse(
-                body,
-                errorCode
-            );
+            if (isNumber(body)) {
+                rpCallback.onResponse(
+                        body,
+                        ErrorCode.valueOf(Long.parseLong(body))
+                );
+            } else {
+                if (useDecrypt) {
+                    body = new CipherApi(
+                            userModel.getSha1(),
+                            userModel.getSha2()
+                    ).decryptToString(body);
+                }
+                rpCallback.onResponse(body, null);
+            }
         }
 
-    }
+        @Override
+        public void onFailure(Exception e) {
+            rpCallback.onException(e);
+        }
 
+        private boolean isNumber(String text) {
+            return text != null && text.trim().matches("[0-9]+");
+        }
+    }
 }

@@ -30,6 +30,9 @@ public class CipherApi extends AESCipher {
         }
         return newCipherDecryptMode().doFinal(data);
     }
-    
+
+    public String decryptToString(String text) throws Exception {
+        return new String(decrypt(text));
+    }
     
 }

@@ -7,9 +7,11 @@ import android.util.Log;
 import android.widget.TextView;
 import com.easyapp.ronnyy.rpeasyapp.ErrorCode;
 import com.easyapp.ronnyy.rpeasyapp.RpCallback;
+import com.easyapp.ronnyy.rpeasyapp.RpClient;
 import com.easyapp.ronnyy.rpeasyapp.RpService;
 import com.easyapp.ronnyy.rpeasyapp.UserModel;
 import com.easyapp.ronnyy.security.AppIntegrity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -43,17 +45,23 @@ public class MainActivity extends Activity {
          text.setText(e.toString());
          }*/
 
-        
-        UserModel model = UserModel.buider()
-            .setName("carlosdemo")
-            .setSha1("68ba07a72441703b")
-            .setSha2("166082cfe709f30b")
-            .setToken("-NR96y3H9yAsoczTOvzu")
+
+
+        UserModel model = UserModel.builder()
+            .setAuth("easyapp")
+            .setUser("Ronnyy")
+            .setPassword("root@2424")
+            .setSha1("5126aaec7a6fd3f1")
+            .setSha2("1a23f6c1fb0433fe")
+            .setToken("-NR57_gFh_r2LWatEt3f")
             .create();
 
         RpService h = RpService.newRpService(model);
+
+
+
        
-        h.login(new RpCallback(){
+        h.changeCipher(new RpCallback(){
 
                 @Override
                 public void onResponse(String body, ErrorCode error) {
