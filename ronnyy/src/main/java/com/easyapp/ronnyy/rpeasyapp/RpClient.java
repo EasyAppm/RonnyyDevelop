@@ -7,6 +7,7 @@ import com.http.ceas.core.annotation.InsertionType;
 import com.http.ceas.core.annotation.Params;
 import com.http.ceas.core.annotation.verbs.GET;
 
+
 public interface RpClient {
     
     @Insert(InsertionType.BASE_URL)
